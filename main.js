@@ -1,43 +1,59 @@
-const posts = document.querySelectorAll('.post')
-const times = document.querySelector('#times')
+const DOM = {
+  posts: document.querySelectorAll('.post'),
+  times: document.querySelector('#times'),
 
-let clickTime = 0
-let timesClicked = 0
+  createElementOnDoubleClick(event, element) {
+    const heart = document.createElement('i')
+    heart.className = 'fas fa-heart'
 
-posts.forEach(post => {
-  post.addEventListener('click', (event) => {
-    if (clickTime === 0) {
-      clickTime = new Date().getTime()
-    } else {
-      if ((new Date().getTime() - clickTime) < 800) {
-        createHeart(event, post)
-        clickTime = 0
-      } else {
-        clickTime = new Date().getTime()
-        console.log(clickTime)
-      }
-    }
-  })
-})
+    const { xInside, yInside } = DoubleClick.getClickPosition(event, element)
 
-const createHeart = (event, post) => {
-  const heart = document.createElement('i')
-  heart.className = 'fas fa-heart'
+    heart.style.top = `${yInside}px`
+    heart.style.left = `${xInside}px`
 
-  const x = event.clientX
-  const y = event.clientY
+    element.appendChild(heart)
+    DOM.times.innerHTML = ++DoubleClick.timesClicked
 
-  const leftOffset = event.target.offsetLeft
-  const topOffset = event.target.offsetTop
-
-  const xInside = x - leftOffset
-  const yInside = y - topOffset
-
-  heart.style.top = `${yInside}px`
-  heart.style.left = `${xInside}px`
-
-  post.appendChild(heart)
-  times.innerHTML = ++timesClicked
-
-  setTimeout(() => heart.remove(), 1000)
+    setTimeout(() => heart.remove(), 5000)
+  }
 }
+
+const DoubleClick = {
+  clickTime: 0,
+  clickDelay: 800,
+  timesClicked: 0,
+
+  getClickPosition(event, element) {
+    const x = event.clientX
+    const y = event.clientY
+
+    const leftElement = element.getBoundingClientRect().left
+    const topElement = element.getBoundingClientRect().top
+
+    const xInside = x - leftElement
+    const yInside = y - topElement
+
+    return { xInside, yInside }
+  },
+
+  doubleClickEvent(element) {
+    element.addEventListener('click', event => {
+      // Primeiro Click  
+      if (DoubleClick.clickTime === 0) {
+        DoubleClick.clickTime = new Date().getTime()
+      } else {
+        // Segundo Click: verifica o delay entre o primeiro e o segundo.
+        // Se for menor que "clickDelay", chama a função e reseta o "clickTime".
+        if ((new Date().getTime() - DoubleClick.clickTime) < DoubleClick.clickDelay) {
+          DOM.createElementOnDoubleClick(event, element)
+          DoubleClick.clickTime = 0
+        } else {
+          // Conta como "primeiro click" de novo
+          DoubleClick.clickTime = new Date().getTime()
+        }
+      }
+    })
+  }
+}
+
+DOM.posts.forEach(post => DoubleClick.doubleClickEvent(post))

@@ -14,7 +14,7 @@ const DOM = {
     element.appendChild(heart)
     DOM.times.innerHTML = ++DoubleClick.timesClicked
 
-    setTimeout(() => heart.remove(), 5000)
+    setTimeout(() => heart.remove(), 800)
   }
 }
 

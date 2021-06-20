@@ -32,7 +32,7 @@ const CreatePosts = {
               </a>
             </li>
           </ul>
-          <small>You like it <span class="clickCount">0</span> times</small>
+          <small>You like it <span class="likes-counter">0</span> times</small>
         </section>
       </article>
     `

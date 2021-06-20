@@ -1,14 +1,41 @@
 const DoubleClick = {
   posts: document.querySelectorAll('.post'),
-  likesEl: document.querySelectorAll('.clickCount'),
-  solidHearts: document.querySelectorAll('.interactions .fas.fa-heart'),
+  likesCounterEl: document.querySelectorAll('.likes-counter'),
+  hearts: document.querySelectorAll('.interactions .fas.fa-heart'),
+  anchors: document.querySelectorAll('.interactions a'),
 
-  clickCount: [],
+  likesCounterArray: [],
+  heartPumpQueue: [],
 
   clickTime: 0,
   clickDelay: 800,
-  elementIndex: null,
+  clickedElementIndex: null,
 
+  likeOnAnchor(anchor, index) {
+    anchor.addEventListener('click', event => {
+      event.preventDefault()
+      if (anchor.title === 'Like') DoubleClick.incrementLikesCounter(index / 3)
+    })
+  },
+
+  animationOnDoubleClick(index) {
+    if (!DoubleClick.hearts[index].classList.contains('fav')) {
+      DoubleClick.hearts[index].classList.add('fav')
+    } else if (DoubleClick.hearts[index].classList.contains('fav') && DoubleClick.hearts[index].classList.contains('pump')) {
+      return
+    } else {
+      DoubleClick.hearts[index].classList.add('pump')
+      setTimeout(() => DoubleClick.hearts[index].classList.remove('pump'), 850)
+    }
+  },
+
+  incrementLikesCounter(index) {
+    DoubleClick.likesCounterArray[index] += 1
+    DoubleClick.likesCounterEl[index].innerHTML = this.likesCounterArray[index]
+
+    DoubleClick.animationOnDoubleClick(index)
+  },
+  
   getClickPosition(event, element) {
     const x = event.clientX
     const y = event.clientY
@@ -20,21 +47,6 @@ const DoubleClick = {
     const yInside = y - topElement
 
     return { xInside, yInside }
-  },
-
-  incrementClickCount(index) {
-    const countEl = DoubleClick.likesEl[index]
-    DoubleClick.clickCount[index] += 1
-    countEl.innerHTML = DoubleClick.clickCount[index]
-  },
-
-  animationAfterDoubleClick(index) {
-    if (DoubleClick.solidHearts[index].classList.contains('fav')) {
-      DoubleClick.solidHearts[index].classList.add('jump')
-      setTimeout(() => DoubleClick.solidHearts[index].classList.remove('jump'), 800)
-    } else {
-      DoubleClick.solidHearts[index].classList.add('fav')
-    }
   },
 
   createElementOnDoubleClick(event, element) {
@@ -58,17 +70,16 @@ const DoubleClick = {
         DoubleClick.elementIndex = index
       } else {
         // Segundo Click: verifica o delay entre o primeiro e o segundo click e se o index do elemento clicado é o mesmo do primeiro clique.
-        // Se for menor que "clickDelay", chama a função e reseta o "clickTime".
-        if (((new Date().getTime() - DoubleClick.clickTime) < DoubleClick.clickDelay) && DoubleClick.elementIndex === index) {
+        // Se for menor que "clickDelay", chama a função e reseta o "clickTime" e "elementIndex".
+        if (((new Date().getTime() - DoubleClick.clickTime) < DoubleClick.clickDelay) && DoubleClick.clickedElementIndex === index) {
           DoubleClick.createElementOnDoubleClick(event, element)
-          DoubleClick.incrementClickCount(index)
-          DoubleClick.animationAfterDoubleClick(index)
+          DoubleClick.incrementLikesCounter(index)
           DoubleClick.clickTime = 0
-          DoubleClick.elementIndex = null
+          DoubleClick.clickedElementIndex = null
         } else {
           // Conta como "primeiro click" de novo e atribui o novo index do elemento.
           DoubleClick.clickTime = new Date().getTime()
-          DoubleClick.elementIndex = index
+          DoubleClick.clickedElementIndex = index
         }
       }
     })
@@ -76,6 +87,7 @@ const DoubleClick = {
 }
 
 DoubleClick.posts.forEach((post, index) => {
-  DoubleClick.clickCount.push(0)
+  DoubleClick.likesCounterArray.push(0)
   DoubleClick.doubleClickEvent(post, index)
 })
+DoubleClick.anchors.forEach((anchor, index) => DoubleClick.likeOnAnchor(anchor, index))

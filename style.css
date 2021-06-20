@@ -90,16 +90,16 @@ article > section {
   font-size: 18.72px;
   color: #f00;
   transform: translate(-50%, -50%) scale(0);
-  transition: transform 0.5s ease;
+  transition: transform 0.5s ease-in-out;
 }
 
-.interactions li a i.fas.fa-heart.fav {
+.interactions li a i.fas.fa-heart.fav:not(.pump) {
   transform: translate(-50%, -50%) scale(1);
+  animation: heartPump 0.8s ease-in-out 0.43s forwards;
 }
 
-.interactions li a i.fas.fa-heart.fav.jump {
-  transform: translate(-50%, -50%) scale(1);
-  animation: heartPump 0.8s ease-in-out;
+.interactions li a i.fas.fa-heart.fav.pump {
+  animation: heartPump 0.8s ease-in-out infinite;
 }
 
 section small {
@@ -135,17 +135,3 @@ section small {
     transform: translate(-50%, -50%) scale(1);
   }
 }
-
-/* @keyframes heartJump {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-
-  50% {
-    transform: translate(-50%, -50%) scale(1.2);
-  }
-
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-} */
